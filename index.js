@@ -25,8 +25,8 @@ app.use(cookieParser())
 
 
 
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ma7e2wv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-const uri = "mongodb+srv://shop-stream:v20kYXkM5SLtOL75@cluster0.ma7e2wv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.ma7e2wv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+// const uri = "mongodb+srv://shop-stream:v20kYXkM5SLtOL75@cluster0.ma7e2wv.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
