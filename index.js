@@ -57,6 +57,7 @@ const verifiedToken=async(req,res,next)=>{
 async function run() {
   try {
     const userCollection = client.db('shopStream').collection('user')
+    const productCollection = client.db('shopStream').collection('products')
 
 
     app.post('/jwt', async (req, res) => {
@@ -95,6 +96,53 @@ async function run() {
           console.log(user)
           const result=await userCollection.insertOne(user)
           res.send(result)
+        })
+
+        app.get("/products",async(req,res)=>{
+          try {
+            const { 
+                search = '', 
+                category, 
+                brand, 
+                minPrice, 
+                maxPrice, 
+                sort = 'createdAt', 
+                order = 'desc', 
+                page = 1, 
+                limit = 10 
+            } = req.query;
+
+            const query = {
+                ...(search && { name: { $regex: search, $options: 'i' } }),
+                ...(category && { category }),
+                ...(brand && { brand }),
+                ...(minPrice && maxPrice && { price: { $gte: parseFloat(minPrice), $lte: parseFloat(maxPrice) } }),
+            };
+
+            const sortBy = { [sort]: order === 'asc' ? 1 : -1 };
+            const skip = (parseInt(page) - 1) * parseInt(limit);
+            const limitNum = parseInt(limit);
+
+            const products = await productCollection.find(query)
+                .sort(sortBy)
+                .skip(skip)
+                .limit(limitNum)
+                .toArray();
+
+            const totalProducts = await productCollection.countDocuments(query);
+            const totalPages = Math.ceil(totalProducts / limitNum);
+
+            res.json({
+                products,
+                totalProducts,
+                totalPages,
+                currentPage: parseInt(page),
+            });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal server error' });
+        }
         })
 
     // Connect the client to the server	(optional starting in v4.7)
